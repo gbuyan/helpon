@@ -17,3 +17,7 @@ hedera:
     shard: 0
     realm: 0
     num: 0
+
+spring:
+  jackson:
+    default-property-inclusion: non_null
