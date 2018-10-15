@@ -1,0 +1,19 @@
+server:
+  port: 9090
+hedera:
+  node:
+    host: localhost
+    port: 50211
+    account:
+      shard: 0
+      realm: 0
+      num: 0
+  paying:
+    account:
+      shard: 0
+      realm: 0
+      num: 0
+  contract:
+    shard: 0
+    realm: 0
+    num: 0
