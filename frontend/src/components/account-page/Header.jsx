@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import styled from "styled-components";
 import {MainWrapper} from "../styled/wrappers";
-import {ReactComponent as Logo} from '../../assets/images/icons/logo.svg';
+import Logo from "../common/Logo";
 import Logout from "./Logout";
 
 const Header = () => (

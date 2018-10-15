@@ -135,7 +135,7 @@ class Authorize extends Component {
 
         this.setState({errors});
 
-        if (Object.keys(errors).length !== 0) registrationRequest();
+        if (Object.keys(errors).length === 0) registrationRequest();
     }
 }
 

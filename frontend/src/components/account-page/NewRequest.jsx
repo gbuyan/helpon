@@ -1,60 +1,78 @@
-import React from 'react';
+import React, {Component} from 'react';
 import styled from 'styled-components';
 import {Title} from "../styled/titles";
 import {MainWrapper} from "../styled/wrappers";
 import {ReactComponent as Icon} from '../../assets/images/icons/file.svg';
 import {Button} from "../styled/buttons";
 
-const NewRequest = ({file}) => (
-    <Section>
-        <MainWrapper>
-            <Title>NEW REQUEST</Title>
+class NewRequest extends Component {
+    state = {
+        category: 'FOOD',
+        amount: 0.00,
+        file: null
+    };
 
-            <Form>
-                <Top>
-                    <Label>
-                        <InputTitle>Choose category</InputTitle>
+    render() {
+        const {amount, file} = this.state;
+        return (
+            <Section>
+                <MainWrapper>
+                    <Title>NEW REQUEST</Title>
 
-                        <Select>
-                            <option value="FOOD">FOOD</option>
-                            <option value="MEDS">MEDS</option>
-                            <option value="CLOTHING">CLOTHING</option>
-                            <option value="HOUSE_HOLD">HOUSE_HOLD</option>
-                            <option value="OTHER">OTHER</option>
-                        </Select>
-                    </Label>
+                    <Form onSubmit={this.submitHandler}>
+                        <Top>
+                            <Label>
+                                <InputTitle>Choose category</InputTitle>
 
-                    <Label>
-                        <InputTitle>Required amount</InputTitle>
+                                <Select onChange={({target: {value}}) => this.changeHandler('category', value)}>
+                                    <option value="FOOD">Food</option>
+                                    <option value="MEDS">Medicine</option>
+                                    <option value="CLOTHING">Clothing</option>
+                                    <option value="HOUSE_HOLD">House hold items</option>
+                                    <option value="OTHER">Other</option>
+                                </Select>
+                            </Label>
 
-                        <Input
-                            type='number'
-                            placeholder='0.00'
-                        />
-                    </Label>
-                </Top>
+                            <Label>
+                                <InputTitle>Required amount</InputTitle>
 
-                <Label>
-                    <InputTitle>Justification of the request</InputTitle>
+                                <Input
+                                    type='number'
+                                    value={amount}
+                                    onChange={({target: {value}}) => this.changeHandler('amount', value)}
+                                />
+                            </Label>
+                        </Top>
 
-                    <TextArea
-                        placeholder='Describe your situation'
-                    />
-                </Label>
+                        <Label>
+                            <InputTitle>Justification of the request</InputTitle>
 
-                <InputFile>
-                    {file ? file.name : 'Attach a document'}
+                            <TextArea
+                                placeholder='Describe your situation'
+                            />
+                        </Label>
 
-                    <Icon/>
+                        <InputFile>
+                            {file ? file.name : 'Attach a document'}
 
-                    <input type="file"/>
-                </InputFile>
+                            <Icon/>
 
-                <Button>Send</Button>
-            </Form>
-        </MainWrapper>
-    </Section>
-);
+                            <input type="file" onChange={({target: {file}}) => this.changeHandler('file', file[0])}/>
+                        </InputFile>
+
+                        <Button>Send</Button>
+                    </Form>
+                </MainWrapper>
+            </Section>
+        )
+    }
+
+    changeHandler = (name, value) => this.setState({[name]: value});
+
+    submitHandler = event => {
+        event.preventDefault();
+    }
+}
 
 const InputFile = styled.label`
     cursor: pointer;
@@ -93,7 +111,7 @@ const Select = styled.select`
 `;
 
 const Form = styled.form`
-  padding: 50px 0;
+  padding: 50px 0 0;
   ${Button} {
     border-radius: 5px;
     min-width: 200px;
@@ -140,6 +158,7 @@ const Input = styled.input`
 
 const TextArea = styled.textarea`
     width: 100%;
+    height: 100px;
     border: none;
     outline: none;
     box-shadow: 0 0 6px rgba(97, 138, 183, 0.5);
