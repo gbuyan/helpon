@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController("giverRequestController")
 @RequestMapping("/api/v1/giver/request")
 public class RequestController {
 
