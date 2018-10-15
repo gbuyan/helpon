@@ -4,7 +4,9 @@ import io.halpon.backend.domain.RequestForHelp;
 import io.halpon.backend.domain.RequestStatus;
 import io.halpon.backend.service.UserRequestService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,7 @@ public class UserRequestServiceImpl implements UserRequestService {
     }
 
     @Override
-    public RequestForHelp createRequest(RequestForHelp requestForHelp) {
+    public RequestForHelp createRequest(@RequestBody @Valid RequestForHelp requestForHelp) {
         //TODO contract call
         requestForHelp.setId((long) requestForHelps.size());
         requestForHelp.setStatus(RequestStatus.INIT);
