@@ -1,6 +1,7 @@
-package io.halpon.backend.service;
+package io.halpon.backend.service.impl;
 
 import io.halpon.backend.domain.Donation;
+import io.halpon.backend.service.DonationService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
