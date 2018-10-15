@@ -1,8 +1,10 @@
 package io.halpon.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class User implements Authentication {
     private Long id;

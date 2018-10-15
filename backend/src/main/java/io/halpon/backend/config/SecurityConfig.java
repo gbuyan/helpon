@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sameOrigin()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/api/v1/authorize").permitAll()
+                .antMatchers("/", "/api/v1/authorize", "/api/v1/registration").permitAll()
                 .antMatchers("/api/**").authenticated();
 
     }
