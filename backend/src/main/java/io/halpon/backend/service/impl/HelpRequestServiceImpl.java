@@ -1,8 +1,9 @@
 package io.halpon.backend.service.impl;
 
+import io.halpon.backend.domain.CloseHelpRequest;
 import io.halpon.backend.domain.RequestForHelp;
 import io.halpon.backend.domain.RequestStatus;
-import io.halpon.backend.service.UserRequestService;
+import io.halpon.backend.service.HelpRequestService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserRequestServiceImpl implements UserRequestService {
+public class HelpRequestServiceImpl implements HelpRequestService {
     private final List<RequestForHelp> requestForHelps = new ArrayList<>();
 
     @Override
@@ -54,5 +55,16 @@ public class UserRequestServiceImpl implements UserRequestService {
             requestForHelp.setStatus(RequestStatus.COMPLETED);
             return requestForHelp;
         }).findFirst().orElse(null);
+    }
+
+    @Override
+    public void closeHelpRequest(Long id, CloseHelpRequest closeHelpRequest) {
+        //TODO contract call
+    }
+
+    @Override
+    public List<RequestForHelp> getCompanyHelpRequests() {
+        //TODO contract call
+        return null;
     }
 }
