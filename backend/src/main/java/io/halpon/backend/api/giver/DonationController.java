@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/giver/request")
+@RequestMapping("/api/v1/giver/donation")
 public class DonationController {
 
     private final DonationService donationService;
@@ -20,7 +20,7 @@ public class DonationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Donation>> getDonations() {
+    public ResponseEntity<List<Donation>> getUserDonations() {
         return ResponseEntity.ok(donationService.getUserDonations());
     }
 

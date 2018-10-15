@@ -15,7 +15,7 @@ public class UserRequestServiceImpl implements UserRequestService {
     private final List<RequestForHelp> requestForHelps = new ArrayList<>();
 
     @Override
-    public List<RequestForHelp> getRequests() {
+    public List<RequestForHelp> getUserRequests() {
         //TODO contract call
         return requestForHelps;
     }
@@ -27,5 +27,32 @@ public class UserRequestServiceImpl implements UserRequestService {
         requestForHelp.setStatus(RequestStatus.INIT);
         requestForHelps.add(requestForHelp);
         return requestForHelp;
+    }
+
+    @Override
+    public List<RequestForHelp> getAllRequests() {
+        //TODO contract call
+
+        return requestForHelps;
+    }
+
+    @Override
+    public RequestForHelp voidForHelpRequest(Long id, boolean isOk) {
+        //TODO contract call
+
+        return requestForHelps.stream().filter(requestForHelp -> requestForHelp.getId() == id).map(requestForHelp -> {
+            requestForHelp.setStatus(RequestStatus.APPROVED);
+            return requestForHelp;
+        }).findFirst().orElse(null);
+    }
+
+    @Override
+    public RequestForHelp voidForCloseHelpRequest(Long id, boolean isOk) {
+        //TODO contract call
+
+        return requestForHelps.stream().filter(requestForHelp -> requestForHelp.getId() == id).map(requestForHelp -> {
+            requestForHelp.setStatus(RequestStatus.COMPLETED);
+            return requestForHelp;
+        }).findFirst().orElse(null);
     }
 }
