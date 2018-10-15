@@ -67,9 +67,9 @@ contract HelpOn is Owned {
         sity = givers[id].sity;
     }
 
-    function getGiverDonations(uint userId, DonationType donationType) public view returns (uint[] ids) {
+    function getGiverDonations(uint userId) public view returns (uint[] ids) {
         require(givers.length > userId, "Giver not found");
-        ids = userDonations[userId][uint(donationType)];
+        ids = userDonations[userId];
     }
 
     function registerGetter(string fullName, string sity) public {
@@ -88,9 +88,9 @@ contract HelpOn is Owned {
         sity = getters[id].sity;
     }
 
-    function getGetterHelpRequests(uint userId, DonationType donationType) public view returns (uint[] ids) {
+    function getGetterHelpRequests(uint userId) public view returns (uint[] ids) {
         require(getters.length > userId, "Getters not found");
-        ids = userHelpRequests[userId][uint(donationType)];
+        ids = userHelpRequests[userId];
     }
 
     function registerOrganization(string fullName, string sity, string hederaFileId, DonationType donationType) public {
@@ -102,43 +102,57 @@ contract HelpOn is Owned {
         emit UserCreated(orgId, fullName, sity, UserRole.ORGANISATION);
     }
 
+    function getOrganizationInfo(uint id) public view returns (string name, string sity, string hederaFileId, DonationType donationType) {
+        require(organizations.length > id, "Organization not found");
+
+        hederaFileId = organizations[id].hederaFileId;
+        donationType = organizations[id].donationType;
+        name = organizations[id].fullName;
+        sity = organizations[id].sity;
+    }
 
     //Donationas
     //Donation[] donations;
-    mapping(uint => mapping(uint => uint[])) userDonations;
-    mapping(uint => Donation[]) donations;
+    mapping(uint => uint[]) userDonations;
+    Donation[] donations;
     mapping(uint => uint) donationsValue;
 
     struct Donation {
         uint value;
         uint userId;
+        DonationType donationType;
     }
 
     event NewDonation(DonationType donationType, uint value, uint userId, string userName);
 
     function donate(DonationType donationType) public payable onlyGiver {
         uint userId = giversIds[msg.sender];
-        uint donationId = donations[uint(donationType)].push(Donation(msg.value, userId)) - 1;
-        userDonations[userId][uint(donationType)].push(donationId);
+        uint donationId = donations.push(Donation(msg.value, userId, donationType)) - 1;
+        userDonations[userId].push(donationId);
         donationsValue[uint(donationType)] += msg.value;
         emit NewDonation(donationType, msg.value, userId, givers[userId].fullName);
     }
 
-    function getDonationInfo(uint donationId, DonationType donType) view public returns (DonationType donationType, uint value, uint userId) {
-        Donation memory donation = donations[uint(donType)][donationId];
+    function getDonationInfo(uint donationId) view public returns (DonationType donationType, uint value, uint userId) {
+        Donation memory donation = donations[donationId];
         require(donation.value != 0, "Donation not found");
 
-        donationType = donType;
+        donationType = donation.donationType;
         value = donation.value;
         userId = donation.userId;
     }
 
-    //HelpRequest
+    function getDonationCount() view public returns (uint count) {
+        count = donations.length;
+    }
 
-    mapping(uint => HelpRequest[]) helpRequests;
-    mapping(uint => mapping(uint => uint[])) userHelpRequests;
+    //HelpRequest
+    HelpRequest[] helpRequests;
+    // mapping (uint=> HelpRequest[]) helpRequests;
+    mapping(uint => uint[]) userHelpRequests;
 
     struct HelpRequest {
+        DonationType donationType;
         uint value;
         uint userId;
         string hederaFileId;
@@ -151,7 +165,7 @@ contract HelpOn is Owned {
         APPROVED,
         CANCELED,
         CLOSING,
-        COMPLITED
+        COMPLETED
     }
 
     event NewHelpRequest(uint helpRequestId, DonationType donationType, uint value, uint userId, string userName);
@@ -159,21 +173,25 @@ contract HelpOn is Owned {
     function askForHelp(DonationType donationType, uint value, string hederaFileId) public onlyGetter {
         require(donationsValue[uint(donationType)] >= value, "HelpOn has no enough money");
         uint userId = gettersIds[msg.sender];
-        uint helpRequestId = helpRequests[uint(donationType)].push(HelpRequest(value, userId, hederaFileId, HelpRequestStatus.INIT)) - 1;
-        userHelpRequests[userId][uint(donationType)].push(helpRequestId);
+        uint helpRequestId = helpRequests.push(HelpRequest(donationType, value, userId, hederaFileId, HelpRequestStatus.INIT)) - 1;
+        userHelpRequests[userId].push(helpRequestId);
 
         emit NewHelpRequest(helpRequestId, donationType, value, userId, getters[userId].fullName);
     }
 
-    function getHelpRequestInfo(uint requestId, DonationType donationType) view public returns (DonationType requestType, uint value, uint userId, string hederaFileId, HelpRequestStatus status) {
-        HelpRequest memory request = helpRequests[uint(donationType)][requestId];
-        require(helpRequests[uint(donationType)][requestId].status != HelpRequestStatus.NONE, "Help request not found");
+    function getHelpRequestInfo(uint requestId) view public returns (DonationType donationType, uint value, uint userId, string hederaFileId, HelpRequestStatus status) {
+        HelpRequest memory request = helpRequests[requestId];
+        require(helpRequests[requestId].status != HelpRequestStatus.NONE, "Help request not found");
 
-        requestType = donationType;
+        donationType = request.donationType;
         value = request.value;
         userId = request.userId;
         hederaFileId = request.hederaFileId;
         status = request.status;
+    }
+
+    function getHelpRequestsCount() view public returns (uint count) {
+        count = helpRequests.length;
     }
 
     struct Voiting {
@@ -181,39 +199,38 @@ contract HelpOn is Owned {
         uint total;
     }
 
-    mapping(uint => mapping(uint => Voiting)) helpRequestVoiting;
-    mapping(uint => mapping(uint => mapping(address => uint))) voiters;
+    mapping(uint => Voiting) helpRequestVoiting;
+    mapping(uint => mapping(address => uint)) voiters;
 
-    event HelpRequestStatusChanged(uint helpRequestId, DonationType donationType, HelpRequestStatus status);
+    event HelpRequestStatusChanged(uint helpRequestId, HelpRequestStatus status);
 
 
-    function voitForHelpRequest(uint requestId, DonationType donationType, bool appruved) public onlyGiver {
+    function voitForHelpRequest(uint requestId, bool appruved) public onlyGiver {
         //todo check giver rights
-        require(helpRequests[uint(donationType)].length > requestId, "Help request not found");
-        require(helpRequests[uint(donationType)][requestId].status == HelpRequestStatus.INIT, "Invalid help request status");
-        require(helpRequestVoiting[uint(donationType)][requestId].total <= 3, "Voiting is over");
-        require(voiters[uint(donationType)][requestId][msg.sender] == 0, "You voited already");
-        voiters[uint(donationType)][requestId][msg.sender] = 1;
+        require(helpRequests.length > requestId, "Help request not found");
+        require(helpRequests[requestId].status == HelpRequestStatus.INIT, "Invalid help request status");
+        require(helpRequestVoiting[requestId].total <= 3, "Voiting is over");
+        require(voiters[requestId][msg.sender] == 0, "You voited already");
+        voiters[requestId][msg.sender] = 1;
 
-        helpRequestVoiting[uint(donationType)][requestId].total += 1;
+        helpRequestVoiting[requestId].total += 1;
         if (appruved) {
-            helpRequestVoiting[uint(donationType)][requestId].appruved += 1;
+            helpRequestVoiting[requestId].appruved += 1;
         }
 
-        if (helpRequestVoiting[uint(donationType)][requestId].total == 3) {
-            if (helpRequestVoiting[uint(donationType)][requestId].appruved == 3) {
-                helpRequests[uint(donationType)][requestId].status = HelpRequestStatus.APPROVED;
-                emit HelpRequestStatusChanged(requestId, donationType, HelpRequestStatus.APPROVED);
+        if (helpRequestVoiting[requestId].total == 3) {
+            if (helpRequestVoiting[requestId].appruved == 3) {
+                helpRequests[requestId].status = HelpRequestStatus.APPROVED;
+                emit HelpRequestStatusChanged(requestId, HelpRequestStatus.APPROVED);
             } else {
-                helpRequests[uint(donationType)][requestId].status = HelpRequestStatus.CANCELED;
-                emit HelpRequestStatusChanged(requestId, donationType, HelpRequestStatus.CANCELED);
+                helpRequests[requestId].status = HelpRequestStatus.CANCELED;
+                emit HelpRequestStatusChanged(requestId, HelpRequestStatus.CANCELED);
             }
         }
     }
 
-    mapping(uint => CloseRequest[]) closeRequests;
-    mapping(uint => mapping(uint => uint[])) organizationsCloseRequests;
-    mapping(uint => mapping(uint => uint)) helpRequestCloseRequest;
+    mapping(uint => CloseRequest) closeRequests;
+    mapping(uint => uint[]) organizationsCloseRequests;
 
     struct CloseRequest {
         uint orgId;
@@ -222,51 +239,50 @@ contract HelpOn is Owned {
         string hederaFileId;
     }
 
-    event NewCloseRequest(uint helpRequestId, DonationType donationType, uint closeRequestId);
+    event NewCloseRequest(uint helpRequestId);
 
 
-    function closeHelpRequest(uint requestId, DonationType donationType, uint value, string description, string hederaFileId) public onlyOrganization {
+    function closeHelpRequest(uint requestId, uint value, string description, string hederaFileId) public onlyOrganization {
         uint userId = organizationIds[msg.sender];
-        require(helpRequests[uint(donationType)].length > requestId, "Help request not found");
-        require(helpRequests[uint(donationType)][requestId].status == HelpRequestStatus.APPROVED, "Invalid help request status");
-        require(organizations[userId].donationType == donationType, "Organization dont support this donation type");
+        require(helpRequests.length > requestId, "Help request not found");
+        require(helpRequests[requestId].status == HelpRequestStatus.APPROVED, "Invalid help request status");
+        require(organizations[userId].donationType == helpRequests[requestId].donationType, "Organization dont support this donation type");
 
-        uint closeRequestId = closeRequests[uint(donationType)].push(CloseRequest(userId, value, description, hederaFileId)) - 1;
-        organizationsCloseRequests[userId][uint(donationType)].push(closeRequestId);
-        helpRequestCloseRequest[uint(donationType)][requestId] = closeRequestId;
-        helpRequests[uint(donationType)][requestId].status = HelpRequestStatus.CLOSING;
+        closeRequests[requestId] = CloseRequest(userId, value, description, hederaFileId);
+        organizationsCloseRequests[userId].push(requestId);
+        helpRequests[requestId].status = HelpRequestStatus.CLOSING;
 
-        emit HelpRequestStatusChanged(requestId, donationType, HelpRequestStatus.CLOSING);
-        emit NewCloseRequest(requestId, donationType, closeRequestId);
+        emit HelpRequestStatusChanged(requestId, HelpRequestStatus.CLOSING);
+        emit NewCloseRequest(requestId);
     }
 
-    mapping(uint => mapping(uint => Voiting)) helpRequestClosingVoiting;
-    mapping(uint => mapping(uint => mapping(address => uint))) closingVoiters;
+    mapping(uint => Voiting) helpRequestClosingVoiting;
+    mapping(uint => mapping(address => uint)) closingVoiters;
 
-    function voitForCloseHelpRequest(uint requestId, DonationType donationType, bool appruved) public onlyGiver {
+    function voitForCloseHelpRequest(uint requestId, bool appruved) public onlyGiver {
         //todo check giver rights
-        require(helpRequests[uint(donationType)].length > requestId, "Help request not found");
-        require(helpRequestVoiting[uint(donationType)][requestId].total <= 3, "Voiting is over");
-        require(helpRequests[uint(donationType)][requestId].status == HelpRequestStatus.CLOSING, "Invalid help request status");
-        require(closingVoiters[uint(donationType)][requestId][msg.sender] == 0, "You voited already");
-        closingVoiters[uint(donationType)][requestId][msg.sender] = 1;
+        require(helpRequests.length > requestId, "Help request not found");
+        require(helpRequestVoiting[requestId].total <= 3, "Voiting is over");
+        require(helpRequests[requestId].status == HelpRequestStatus.CLOSING, "Invalid help request status");
+        require(closingVoiters[requestId][msg.sender] == 0, "You voited already");
+        closingVoiters[requestId][msg.sender] = 1;
 
-        helpRequestClosingVoiting[uint(donationType)][requestId].total += 1;
+        helpRequestClosingVoiting[requestId].total += 1;
         if (appruved) {
-            helpRequestClosingVoiting[uint(donationType)][requestId].appruved += 1;
+            helpRequestClosingVoiting[requestId].appruved += 1;
         }
 
-        if (helpRequestClosingVoiting[uint(donationType)][requestId].total == 3) {
-            if (helpRequestClosingVoiting[uint(donationType)][requestId].appruved == 3) {
-                helpRequests[uint(donationType)][requestId].status = HelpRequestStatus.COMPLITED;
-                uint orgId = closeRequests[uint(donationType)][helpRequestCloseRequest[uint(donationType)][requestId]].orgId;
-                organizations[orgId].addr.transfer(helpRequests[uint(donationType)][requestId].value);
+        if (helpRequestClosingVoiting[requestId].total == 3) {
+            if (helpRequestClosingVoiting[requestId].appruved == 3) {
+                helpRequests[requestId].status = HelpRequestStatus.COMPLETED;
+                uint orgId = closeRequests[requestId].orgId;
+                organizations[orgId].addr.transfer(helpRequests[requestId].value);
                 //transfer money to organization
-                donationsValue[uint(donationType)] -= helpRequests[uint(donationType)][requestId].value;
-                emit HelpRequestStatusChanged(requestId, donationType, HelpRequestStatus.COMPLITED);
+                donationsValue[uint(helpRequests[requestId].donationType)] -= helpRequests[requestId].value;
+                emit HelpRequestStatusChanged(requestId, HelpRequestStatus.COMPLETED);
             } else {
-                helpRequests[uint(donationType)][requestId].status = HelpRequestStatus.CANCELED;
-                emit HelpRequestStatusChanged(requestId, donationType, HelpRequestStatus.CANCELED);
+                helpRequests[requestId].status = HelpRequestStatus.CANCELED;
+                emit HelpRequestStatusChanged(requestId, HelpRequestStatus.CANCELED);
             }
         }
     }
