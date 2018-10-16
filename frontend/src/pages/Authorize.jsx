@@ -21,7 +21,7 @@ const connector = connect(
 class Authorize extends Component {
     state = {
         role: 'giver',
-        name: '',
+        fullName: '',
         city: '',
         file: null,
         errors: {}
@@ -29,7 +29,7 @@ class Authorize extends Component {
 
     render() {
         const {isLoading} = this.props;
-        const {role, name, city, file, errors} = this.state;
+        const {role, fullName, city, file, errors} = this.state;
         return (
             <Wrapper>
                 <Background/>
@@ -64,11 +64,11 @@ class Authorize extends Component {
                         <Label>
                             <Input
                                 placeholder='Full name'
-                                name='name' value={name}
-                                onChange={({target: {name, value}}) => this.changeHandler(name, value)}
+                                value={fullName}
+                                onChange={({target: {name, value}}) => this.changeHandler('fullName', value)}
                             />
 
-                            <Error>{errors.name}</Error>
+                            <Error>{errors.fullName}</Error>
                         </Label>
 
                         <Label>
@@ -112,10 +112,10 @@ class Authorize extends Component {
     }
 
     validation = () => {
-        const {name, city, role, file} = this.state;
+        const {fullName, city, role, file} = this.state;
         const errors = {};
 
-        if (validator.isEmpty(name)) errors.name = 'Required field';
+        if (validator.isEmpty(fullName)) errors.fullName = 'Required field';
 
         if (validator.isEmpty(city)) errors.city = 'Required field';
 
@@ -131,11 +131,16 @@ class Authorize extends Component {
 
         event.preventDefault();
 
+        const {role, fullName, city} = this.state;
         const errors = this.validation();
 
         this.setState({errors});
 
-        if (Object.keys(errors).length === 0) registrationRequest();
+        if (Object.keys(errors).length === 0) registrationRequest({
+            role: `ROLE_${role.toUpperCase()}`,
+            fullName,
+            address: city
+        });
     }
 }
 
