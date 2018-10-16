@@ -3,16 +3,16 @@ import {registrationRequest, registrationSuccess, registrationFailure, logout} f
 
 const initialState = {
     isLoading: false,
-    data: [],
+    data: {},
     error: ''
 };
 
 export default handleActions(
     {
-        [registrationRequest]: state => ({...state, isLoading: true, data: [], error: ''}),
+        [registrationRequest]: state => ({...state, isLoading: true, data: {}, error: ''}),
         [registrationSuccess]: (state, action) => ({...state, isLoading: false, data: action.payload}),
         [registrationFailure]: (state, action) => ({...state, isLoading: false, error: action.payload}),
-        [logout]: state => ({...state, isLoading: false, data: [], error: ''})
+        [logout]: state => ({...state, isLoading: false, data: {}, error: ''})
     },
     initialState
 );

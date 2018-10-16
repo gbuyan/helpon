@@ -4,16 +4,24 @@ import {Title} from "../styled/titles";
 import {MainWrapper} from "../styled/wrappers";
 import {ReactComponent as Icon} from '../../assets/images/icons/file.svg';
 import {Button} from "../styled/buttons";
+import {connect} from "react-redux";
+import {getterRequest} from "../../redux/actions/getter";
+
+const connector = connect(
+    state => ({}),
+    {getterRequest}
+);
 
 class NewRequest extends Component {
     state = {
+        description: '',
         category: 'FOOD',
         amount: 0.00,
         file: null
     };
 
     render() {
-        const {amount, file} = this.state;
+        const {amount, file, description} = this.state;
         return (
             <Section>
                 <MainWrapper>
@@ -48,6 +56,8 @@ class NewRequest extends Component {
                             <InputTitle>Justification of the request</InputTitle>
 
                             <TextArea
+                                value={description}
+                                onChange={({target: {value}}) => this.changeHandler('description', value)}
                                 placeholder='Describe your situation'
                             />
                         </Label>
@@ -57,7 +67,7 @@ class NewRequest extends Component {
 
                             <Icon/>
 
-                            <input type="file" onChange={({target: {file}}) => this.changeHandler('file', file[0])}/>
+                            <input type="file" onChange={({target: {files}}) => this.changeHandler('file', files[0])}/>
                         </InputFile>
 
                         <Button>Send</Button>
@@ -71,6 +81,11 @@ class NewRequest extends Component {
 
     submitHandler = event => {
         event.preventDefault();
+
+        const {category, amount, description} = this.state;
+
+        this.props.getterRequest({amount, description, requestType: category});
+        this.setState({description: '', category: 'FOOD', amount: 0.00, file: null});
     }
 }
 
@@ -95,9 +110,7 @@ const InputFile = styled.label`
     }
 `;
 
-const Section = styled.section`
-  padding-top: 50px;
-`;
+const Section = styled.section``;
 
 const Select = styled.select`
     cursor: pointer;
@@ -172,4 +185,4 @@ const TextArea = styled.textarea`
     resize: none;
 `;
 
-export default NewRequest;
+export default connector(NewRequest);

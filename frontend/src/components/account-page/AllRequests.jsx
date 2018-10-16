@@ -3,150 +3,69 @@ import styled from 'styled-components';
 import {MainWrapper} from "../styled/wrappers";
 import qr from '../../assets/images/icons/qr.jpg';
 import {getStatusColor} from "../../helpers";
+import {connect} from "react-redux";
+import {getRequestData} from "../../redux/reducers/requests";
 
-const status1 = 'INIT';
-const status2 = 'APPROVED';
-const status3 = 'CANCELED';
+const connector = connect(
+    state => ({
+        data: getRequestData(state)
+    }),
+    {}
+);
 
-const AllRequests = () => (
+const AllRequests = ({data}) => (
     <Section>
         <MainWrapper>
-            <Plate color={getStatusColor(status1)}>
-                <Right>
-                    <Title>Приют для животных Добрые руки</Title>
+            {
+                Boolean(Object.keys(data).length) && data.map(({id, requestType, description, status, amount}) =>
+                    <Plate key={id} color={getStatusColor(status)}>
+                        <Right>
+                            <Title>Приют для животных Добрые руки</Title>
 
-                    <Description>Приют для животных Добрые руки нуждается в финансовой помощи для закупки кормов, Сена в
-                        вольеры, ремонт здания для гладкошерстных хвостиков(в том числе отопление). Так же у нас не
-                        хватает денег для оплаты зарплаты сотрудникам приюта.. помогите пожалуйста... вот номер счета.
-                        Каждая копеечка нам важна! Мы не просим жертвовать тысячи.. 10,20,50 рублей..</Description>
-                </Right>
+                            <Description>{description}</Description>
+                        </Right>
 
-                <Left>
-                    <Row>
-                        <Name>Date:</Name>
+                        <Left>
+                            <Row>
+                                <Name>Date:</Name>
 
-                        <Value>21.03.2018</Value>
-                    </Row>
+                                <Value>16.10.2018</Value>
+                            </Row>
 
-                    <Row>
-                        <Name>City:</Name>
+                            <Row>
+                                <Name>Amout:</Name>
 
-                        <Value>Moscow</Value>
-                    </Row>
+                                <Value>{amount}</Value>
+                            </Row>
 
-                    <Row>
-                        <Name>Category:</Name>
+                            <Row>
+                                <Name>City:</Name>
 
-                        <Value>MEDC</Value>
-                    </Row>
+                                <Value>Moscow</Value>
+                            </Row>
 
-                    <Row>
-                        <Name>Status:</Name>
+                            <Row>
+                                <Name>Category:</Name>
 
-                        <Value style={{color: getStatusColor(status1)}}>{status1}</Value>
-                    </Row>
+                                <Value>{requestType}</Value>
+                            </Row>
 
-                    <Row>
-                        <Name>QR:</Name>
+                            <Row>
+                                <Name>Status:</Name>
 
-                        <Value>
-                            <img src={qr}/>
-                        </Value>
-                    </Row>
-                </Left>
-            </Plate>
+                                <Value style={{color: getStatusColor(status)}}>{status}</Value>
+                            </Row>
 
+                            <Row>
+                                <Name>QR:</Name>
 
-            <Plate color={getStatusColor(status2)}>
-                <Right>
-                    <Title>Приют для животных Добрые руки</Title>
-
-                    <Description>Приют для животных Добрые руки нуждается в финансовой помощи для закупки кормов, Сена в
-                        вольеры, ремонт здания для гладкошерстных хвостиков(в том числе отопление). Так же у нас не
-                        хватает денег для оплаты зарплаты сотрудникам приюта.. помогите пожалуйста... вот номер счета.
-                        Каждая копеечка нам важна! Мы не просим жертвовать тысячи.. 10,20,50 рублей..</Description>
-                </Right>
-
-                <Left>
-                    <Row>
-                        <Name>Date:</Name>
-
-                        <Value>21.03.2018</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>City:</Name>
-
-                        <Value>Moscow</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>Category:</Name>
-
-                        <Value>MEDC</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>Status:</Name>
-
-                        <Value style={{color: getStatusColor(status2)}}>{status2}</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>QR:</Name>
-
-                        <Value>
-                            <img src={qr}/>
-                        </Value>
-                    </Row>
-                </Left>
-            </Plate>
-
-
-            <Plate color={getStatusColor(status3)}>
-                <Right>
-                    <Title>Приют для животных Добрые руки</Title>
-
-                    <Description>Приют для животных Добрые руки нуждается в финансовой помощи для закупки кормов, Сена в
-                        вольеры, ремонт здания для гладкошерстных хвостиков(в том числе отопление). Так же у нас не
-                        хватает денег для оплаты зарплаты сотрудникам приюта.. помогите пожалуйста... вот номер счета.
-                        Каждая копеечка нам важна! Мы не просим жертвовать тысячи.. 10,20,50 рублей..</Description>
-                </Right>
-
-                <Left>
-                    <Row>
-                        <Name>Date:</Name>
-
-                        <Value>21.03.2018</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>City:</Name>
-
-                        <Value>Moscow</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>Category:</Name>
-
-                        <Value>MEDC</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>Status:</Name>
-
-                        <Value style={{color: getStatusColor(status3)}}>{status3}</Value>
-                    </Row>
-
-                    <Row>
-                        <Name>QR:</Name>
-
-                        <Value>
-                            <img src={qr}/>
-                        </Value>
-                    </Row>
-                </Left>
-            </Plate>
+                                <Value>
+                                    <img src={qr} alt='pic'/>
+                                </Value>
+                            </Row>
+                        </Left>
+                    </Plate>)
+            }
         </MainWrapper>
     </Section>
 );
@@ -198,6 +117,7 @@ const Plate = styled.div`
 
 const Right = styled.div`
     padding: 35px 40px 0 60px;
+    flex: 1 1 auto;
 `;
 
 const Title = styled.h2`
@@ -223,6 +143,7 @@ const Left = styled.div`
   justify-content: space-between;
   background: #F6F6F6;
   padding: 36px 25px 31px 36px;
+    flex: 0 1 auto;
 `;
 
-export default AllRequests;
+export default connector(AllRequests);

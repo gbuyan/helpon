@@ -13,7 +13,8 @@ const Requests = () => (
             <Title>LAST REQUESTS</Title>
 
             <Subtitle>
-                Pooch Hotel offers the best dog daycare with a pool*, complete with a variety of services and modern
+                Pooch Hotel offers the best dog daycare with a pool*, complete with a variety of services and
+                modern
                 facilities. Each day's agenda includes
             </Subtitle>
 
@@ -29,7 +30,8 @@ const Requests = () => (
                     <PlateBottom>
                         <BottomTitle>The most popular breeds of dogs</BottomTitle>
 
-                        <Text>Not all dog breeds can boast of its popularity. Some give birth only true vowed..</Text>
+                        <Text>Not all dog breeds can boast of its popularity. Some give birth only true
+                            vowed..</Text>
                     </PlateBottom>
                 </Plate>
 
@@ -45,7 +47,8 @@ const Requests = () => (
                     <PlateBottom>
                         <BottomTitle>The most popular breeds of dogs</BottomTitle>
 
-                        <Text>Not all dog breeds can boast of its popularity. Some give birth only true vowed..</Text>
+                        <Text>Not all dog breeds can boast of its popularity. Some give birth only true
+                            vowed..</Text>
                     </PlateBottom>
                 </Plate>
 
@@ -60,7 +63,8 @@ const Requests = () => (
                     <PlateBottom>
                         <BottomTitle>The most popular breeds of dogs</BottomTitle>
 
-                        <Text>Not all dog breeds can boast of its popularity. Some give birth only true vowed..</Text>
+                        <Text>Not all dog breeds can boast of its popularity. Some give birth only true
+                            vowed..</Text>
                     </PlateBottom>
                 </Plate>
             </List>

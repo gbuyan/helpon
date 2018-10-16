@@ -1,48 +1,80 @@
-import React from 'react';
+import React, {Component} from 'react';
 import styled from 'styled-components';
 import {MainWrapper} from "../styled/wrappers";
 import {Button} from "../styled/buttons";
+import {connect} from "react-redux";
+import {donationRequest} from "../../redux/actions/donation";
+import {getDonationData, getIsLoading} from "../../redux/reducers/donation";
+import Loader from "../common/Loader";
 
-const Donate = () => (
-    <Section>
-        <MainWrapper>
-            <Plate>
-                <Title>Приют для животных Добрые руки</Title>
-
-                <Info>
-                    <Row>
-                        <Name>Date:</Name>
-
-                        <Value>20.01.1992</Value>
-                    </Row>
-
-
-                    <Row>
-                        <Name>Category:</Name>
-
-                        <Value>MEDC</Value>
-                    </Row>
-
-
-                    <Row>
-                        <Name>Сollected:</Name>
-
-                        <Value>12552/244444</Value>
-                    </Row>
-                </Info>
-
-                <Description>
-                    Приют для животных Добрые руки нуждается в финансовой помощи для закупки кормов, Сена в вольеры,
-                    ремонт здания для гладкошерстных хвостиков(в том числе отопление). Так же у нас не хватает денег для
-                    оплаты зарплаты сотрудникам приюта.. помогите пожалуйста... вот номер счета. Каждая копеечка нам
-                    важна! Мы не просим жертвовать тысячи.. 10,20,50 рублей..
-                </Description>
-
-                <Button>Donate</Button>
-            </Plate>
-        </MainWrapper>
-    </Section>
+const connector = connect(
+    state => ({
+        isLoading: getIsLoading(state),
+        data: getDonationData(state)
+    }),
+    {donationRequest}
 );
+
+class Donate extends Component {
+    componentDidMount() {
+        this.props.donationRequest();
+    }
+
+    render() {
+        const {isLoading, data} = this.props;
+        return (
+            <Section>
+                {
+                    isLoading ?
+                        <Loader/>
+                        :
+                        <MainWrapper>
+                            <Plate>
+                                <Title>Приют для животных Добрые руки</Title>
+
+                                <Info>
+                                    <Row>
+                                        <Name>Date:</Name>
+
+                                        <Value>20.01.1992</Value>
+                                    </Row>
+
+
+                                    <Row>
+                                        <Name>Category:</Name>
+
+                                        <Value>MEDC</Value>
+                                    </Row>
+
+
+                                    <Row>
+                                        <Name>Сollected:</Name>
+
+                                        <Value>12552/244444</Value>
+                                    </Row>
+                                </Info>
+
+                                <Description>
+                                    Приют для животных Добрые руки нуждается в финансовой помощи для закупки кормов,
+                                    Сена в
+                                    вольеры,
+                                    ремонт здания для гладкошерстных хвостиков(в том числе отопление). Так же у нас не
+                                    хватает
+                                    денег для
+                                    оплаты зарплаты сотрудникам приюта.. помогите пожалуйста... вот номер счета. Каждая
+                                    копеечка
+                                    нам
+                                    важна! Мы не просим жертвовать тысячи.. 10,20,50 рублей..
+                                </Description>
+
+                                <Button>Donate</Button>
+                            </Plate>
+                        </MainWrapper>
+                }
+            </Section>
+        )
+    }
+}
 
 const Title = styled.div`
     font-style: normal;
@@ -90,6 +122,7 @@ const Description = styled.div`
 `;
 
 const Section = styled.section`
+  position: relative;
   padding: 33px 0 83px;
   ${Button} {
     border-radius: 5px;
@@ -105,4 +138,4 @@ const Plate = styled.div`
     padding: 25px 29px 29px 82px;
 `;
 
-export default Donate;
+export default connector(Donate);
